@@ -3,9 +3,12 @@ package net.blabux;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 
 public class GamePanel extends JPanel {
 	private static final long serialVersionUID = -974519052373581194L;
@@ -30,32 +33,30 @@ public class GamePanel extends JPanel {
 	private void loop() {
 		rootEntity.init();
 		long wait = Math.round(1000 / fps);
-		boolean stop = false;
-		while (!stop) {
-			long timeToRun = timeToRun(() -> {
-				rootEntity.update();
-				repaint();
-			});
-			long delay = wait - timeToRun;
-			if (delay > 0) {
-				try {
-					Thread.sleep(delay);
-				} catch (InterruptedException e) {
-					stop = true;
-				}
-			}
-		}
+		step(wait).actionPerformed(null);
 	}
 
-	private long timeToRun(Runnable run) {
-		long begin = System.currentTimeMillis();
-		run.run();
-		return System.currentTimeMillis() - begin;
+	private ActionListener step(final long wait) {
+		final long lastRun = System.currentTimeMillis();
+		return (e) -> {
+			Toolkit.getDefaultToolkit().sync();
+			rootEntity.update();
+			repaint();
+			long now = System.currentTimeMillis();
+			long delay = wait - now + lastRun;
+			if (delay < 0) {
+				delay = 0;
+			}
+			Timer next = new Timer((int) delay, step(wait));
+			next.setRepeats(false);
+			next.start();
+		};
 	}
 
 	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
+	public void paintComponent(Graphics g) {
+		super.paintComponent(g);
+
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
