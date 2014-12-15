@@ -48,7 +48,7 @@ public class Ship implements Entity {
 	}
 
 	private double radius() {
-		return Math.min(width, height);
+		return Math.min(width / 2, height / 2);
 	}
 
 	private Point forAngle(Point center, double radius, double angle) {
@@ -80,5 +80,10 @@ public class Ship implements Entity {
 
 	public void rotateRight() {
 		heading = heading + TURN;
+	}
+
+	public void moveBy(double deltaX, double deltaY) {
+		x += deltaX;
+		y += deltaY;
 	}
 }

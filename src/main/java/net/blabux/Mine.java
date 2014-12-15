@@ -9,6 +9,7 @@ public class Mine extends Object implements Entity {
 	private double y;
 	private double width;
 	private double height;
+	private Ship ship;
 
 	public Mine(Rectangle bounds) {
 		this.x = bounds.x;
