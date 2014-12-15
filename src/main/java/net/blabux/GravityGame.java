@@ -33,6 +33,10 @@ public class GravityGame implements Entity {
 		for (Mine each : mines) {
 			each.update();
 		}
+		calculateGravityPull();
+	}
+
+	private void calculateGravityPull() {
 		Point shipCenter = ship.center();
 		double sumX = shipCenter.x;
 		double sumY = shipCenter.y;
@@ -41,8 +45,8 @@ public class GravityGame implements Entity {
 			double dist = shipCenter.distance(eachCenter);
 			if (dist < 100) {
 				double angle = Math.atan2(eachCenter.y - shipCenter.y, eachCenter.x - shipCenter.x);
-				sumX += Math.cos(angle) * (100 - dist);
-				sumY += Math.sin(angle) * (100 - dist);
+				sumX += Math.cos(angle) * Math.pow((100 - dist), 2);
+				sumY += Math.sin(angle) * Math.pow((100 - dist), 2);
 			}
 		}
 		double moveAngle = Math.atan2(sumY - shipCenter.y, sumX - shipCenter.x);
