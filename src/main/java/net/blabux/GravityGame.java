@@ -49,7 +49,7 @@ public class GravityGame implements Entity {
 	}
 
 	private void die() {
-		// System.exit(0); //not nice
+		panel.restart();
 
 	}
 
@@ -92,48 +92,32 @@ public class GravityGame implements Entity {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				switch (e.getKeyCode()) {
-				case 37:
-					leftArrowPressed();
+				case 37: //left arrow	
+					ship.rotateLeft();
 					break;
-				case 38:
-					upArrowPressed();
+				case 38: //up arrow
+					ship.faster();
 					break;
-				case 39:
-					rightArrowPressed();
+				case 39: //right arrow
+					ship.rotateRight();
 					break;
-				case 40:
-					downArrowPressed();
+				case 40: //down arrow
+					ship.slower();
+					break;
+				case 27: //escape
+					die();
+					panel.exit();
 					break;
 				case ' ':
-					spaceBarPressed();
+					System.out.println("Fire!");
+					break;
 				default:
-					//System.out.println(e);
+					System.out.println("Unknown key: " + e);
 					break;
 				}
 
 			}
 		});
-	}
-
-	private void upArrowPressed() {
-		ship.faster();
-	}
-
-	private void downArrowPressed() {
-		ship.slower();
-	}
-
-	private void leftArrowPressed() {
-		ship.rotateLeft();
-	}
-
-	private void rightArrowPressed() {
-		ship.rotateRight();
-	}
-	
-	private void spaceBarPressed() {
-		System.out.println("Fire!");
-		
 	}
 
 	private void createMines() {
