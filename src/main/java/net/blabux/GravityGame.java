@@ -104,8 +104,10 @@ public class GravityGame implements Entity {
 				case 40:
 					downArrowPressed();
 					break;
+				case ' ':
+					spaceBarPressed();
 				default:
-					// System.out.println(e);
+					//System.out.println(e);
 					break;
 				}
 
@@ -127,6 +129,11 @@ public class GravityGame implements Entity {
 
 	private void rightArrowPressed() {
 		ship.rotateRight();
+	}
+	
+	private void spaceBarPressed() {
+		System.out.println("Fire!");
+		
 	}
 
 	private void createMines() {
