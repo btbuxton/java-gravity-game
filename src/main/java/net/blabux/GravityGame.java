@@ -5,10 +5,12 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
+
+import net.blabux.util.WithDefaultsKeyListener;
 
 public class GravityGame implements Entity {
 	private Ship ship;
@@ -29,11 +31,26 @@ public class GravityGame implements Entity {
 	}
 
 	public void update() {
-		ship.update();
-		for (Mine each : mines) {
-			each.update();
-		}
+		entitiesDo(Entity::update);
 		calculateGravityPull();
+		checkForDeath();
+	}
+
+	private void checkForDeath() {
+		for (Mine mine : mines) {
+			if (ship.bounds().intersects(mine.bounds())) {
+				die();
+			}
+		}
+		if (!bounds().contains(ship.bounds())) {
+			die();
+		}
+
+	}
+
+	private void die() {
+		// System.exit(0); //not nice
+
 	}
 
 	private void calculateGravityPull() {
@@ -44,7 +61,8 @@ public class GravityGame implements Entity {
 			Point eachCenter = each.center();
 			double dist = shipCenter.distance(eachCenter);
 			if (dist < 100) {
-				double angle = Math.atan2(eachCenter.y - shipCenter.y, eachCenter.x - shipCenter.x);
+				double angle = Math.atan2(eachCenter.y - shipCenter.y,
+						eachCenter.x - shipCenter.x);
 				sumX += Math.cos(angle) * Math.pow((100 - dist), 2);
 				sumY += Math.sin(angle) * Math.pow((100 - dist), 2);
 			}
@@ -54,10 +72,7 @@ public class GravityGame implements Entity {
 	}
 
 	public void draw(Graphics2D g) {
-		for (Mine each : mines) {
-			each.draw(g);
-		}
-		ship.draw(g);
+		entitiesDo(entity -> entity.draw(g));
 	}
 
 	@Override
@@ -73,11 +88,7 @@ public class GravityGame implements Entity {
 
 	private void addKeyListener() {
 		panel.setFocusable(true);
-		panel.addKeyListener(new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
-
+		panel.addKeyListener(new WithDefaultsKeyListener() {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				switch (e.getKeyCode()) {
@@ -94,17 +105,11 @@ public class GravityGame implements Entity {
 					downArrowPressed();
 					break;
 				default:
-					System.out.println(e);
+					// System.out.println(e);
 					break;
 				}
 
 			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-
-			}
-
 		});
 	}
 
@@ -126,10 +131,11 @@ public class GravityGame implements Entity {
 
 	private void createMines() {
 		mines = new ArrayList<Mine>(10);
-		Dimension size = new Dimension(10,10);
+		Dimension size = new Dimension(10, 10);
 		for (int i = 0; i < 10; i++) {
 			Point point = getRandomPointWithin(size);
-			mines.add(new Mine(new Rectangle(point.x, point.y, size.width, size.height)));
+			mines.add(new Mine(new Rectangle(point.x, point.y, size.width,
+					size.height)));
 		}
 	}
 
@@ -137,6 +143,11 @@ public class GravityGame implements Entity {
 		Rectangle bounds = bounds();
 		int x = random.nextInt(bounds.width - within.width);
 		int y = random.nextInt(bounds.height - within.height);
-		return new Point(x,y);
+		return new Point(x, y);
+	}
+
+	private void entitiesDo(Consumer<Entity> action) {
+		mines.stream().forEach(action);
+		action.accept(ship);
 	}
 }
