@@ -15,6 +15,7 @@ import net.blabux.util.WithDefaultsKeyListener;
 public class GravityGame implements Entity {
 	private Ship ship;
 	private List<Mine> mines;
+	private Entity laser;
 	private GamePanel panel;
 	private Random random;
 
@@ -28,6 +29,7 @@ public class GravityGame implements Entity {
 		Point center = center();
 		ship = new Ship(new Rectangle(center.x, center.y, 20, 20));
 		createMines();
+		laser = new Nothing();
 	}
 
 	public void update() {
@@ -50,7 +52,6 @@ public class GravityGame implements Entity {
 
 	private void die() {
 		panel.restart();
-
 	}
 
 	private void calculateGravityPull() {
@@ -80,6 +81,13 @@ public class GravityGame implements Entity {
 		return panel.getBounds();
 	}
 
+	public void createLaser(Rectangle bounds, double heading) {
+		if (0 != laser.bounds().width) {
+			return;
+		}
+		laser = new Laser(bounds, heading, () -> laser = new Nothing());
+	}
+
 	private void start() {
 		panel = new GamePanel(30, this);
 		addKeyListener();
@@ -92,24 +100,24 @@ public class GravityGame implements Entity {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				switch (e.getKeyCode()) {
-				case 37: //left arrow	
+				case 37: // left arrow
 					ship.rotateLeft();
 					break;
-				case 38: //up arrow
+				case 38: // up arrow
 					ship.faster();
 					break;
-				case 39: //right arrow
+				case 39: // right arrow
 					ship.rotateRight();
 					break;
-				case 40: //down arrow
+				case 40: // down arrow
 					ship.slower();
 					break;
-				case 27: //escape
+				case 27: // escape
 					die();
 					panel.exit();
 					break;
 				case ' ':
-					System.out.println("Fire!");
+					ship.fire(GravityGame.this);
 					break;
 				default:
 					System.out.println("Unknown key: " + e);
@@ -139,6 +147,7 @@ public class GravityGame implements Entity {
 
 	private void entitiesDo(Consumer<Entity> action) {
 		mines.stream().forEach(action);
+		action.accept(laser);
 		action.accept(ship);
 	}
 }

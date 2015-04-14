@@ -1,6 +1,7 @@
 package net.blabux;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -85,5 +86,10 @@ public class Ship implements Entity {
 	public void moveBy(double deltaX, double deltaY) {
 		x += deltaX;
 		y += deltaY;
+	}
+
+	public void fire(GravityGame game) {
+		Rectangle bounds = new Rectangle(center(), new Dimension(10, 10));
+		game.createLaser(bounds, heading);
 	}
 }

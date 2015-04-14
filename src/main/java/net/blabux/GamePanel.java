@@ -46,7 +46,6 @@ public class GamePanel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
@@ -56,7 +55,15 @@ public class GamePanel extends JPanel {
 	public void restart() {
 		Stopper stop = timerStop;
 		if (null != stop) stop.stop();
-		startLoop();
+		timerStop = null;
+		synchronized(this) {
+			try {
+				wait(50);
+			} catch (InterruptedException e) {
+				//IGNORE
+			}
+		}
+ 		startLoop();
 	}
 
 	public void exit() {
@@ -64,7 +71,7 @@ public class GamePanel extends JPanel {
 		if (null != root) {
 			root.dispose();
 		}
-		
+		System.exit(0);
 	}
 
 }
